@@ -1,29 +1,35 @@
-import bcrypt
+import os
 import uuid
-class PasswordClass():
-    
-    def __init__(self):
-        pass
+import bcrypt
+from dotenv import load_dotenv
+
+load_dotenv()
+
+SECRET_KEY = os.getenv(
+    "SECRET_KEY",
+    "clave-temporal-insegura-cambia-en-env",
+)
+
+
+class PasswordClass:
     @staticmethod
-    def createPw(pw):
+    def createPw(pw: str) -> str:
         salt = bcrypt.gensalt()
-        bit = pw.encode('utf-8')
-        hash = bcrypt.hashpw(bit, salt)
-        return hash
+        pw_bytes = pw.encode("utf-8")
+        hashed = bcrypt.hashpw(pw_bytes, salt)
+        return hashed.decode("utf-8")
+
     @staticmethod
-    def checkPw(pwSource,pwTarget):
-        bit= pwSource.encode('utf-8')
-        endBool= bcrypt.checkpw(bit,pwTarget)
-        return endBool
-    @staticmethod
-    def help():
-        print('''
-        PW.createPw(pw)
-        PW.checkPW(source,target)
-        PW.generate_id()
-        ''')  
+    def checkPw(pw_source: str, pw_target: str | bytes) -> bool:
+        pw_bytes = pw_source.encode("utf-8")
+        target_bytes = (
+            pw_target.encode("utf-8") if isinstance(pw_target, str) else pw_target
+        )
+        return bcrypt.checkpw(pw_bytes, target_bytes)
+
     @staticmethod
     def generate_id() -> str:
         return str(uuid.uuid4())
+
+
 PW = PasswordClass()
-SECRET_KEY="noiuxnq8yw97t2q76d6auk [293u08r7t2yf32bepfijap]wgdywgoiwuhckslue98y38gjdsngi7at97gdoqoboeyw7c9s7gcspdnfl3h9efy8hp4feçsmlk jx9"
